@@ -1,1 +1,1 @@
-# .NET6_TOKEN_MVC_BASIC
+# .NET6 Clean Architecture
