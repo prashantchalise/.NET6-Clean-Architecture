@@ -10,10 +10,10 @@ namespace PROJBP.Service
 	public interface IEntityService<T> : IService
 	where T : BaseEntity
 	{
-		void Create(T entity);
-		void Delete(T entity);
-		IEnumerable<T> GetAll();
-		void Update(T entity);
+		Task CreateAsync(T entity);
+		Task DeleteAsync(T entity);
+		Task<IList<T>> GetAllAsync();
+		Task UpdateAsync(T entity);
 	}
 
 	public abstract class EntityService<T> : IEntityService<T> where T : BaseEntity
@@ -29,35 +29,36 @@ namespace PROJBP.Service
 		}
 
 
-		public virtual void Create(T entity)
+		public virtual async Task CreateAsync(T entity)
 		{
 			if (entity == null)
 			{
 				throw new ArgumentNullException("entity");
 			}
 
-			_dbset.Add(entity);
-			_context.SaveChangesAsync();
+			await _dbset.AddAsync(entity);
+
+			await _context.SaveChangesAsync();
 		}
 
 
-		public virtual void Update(T entity)
+        public virtual async Task UpdateAsync(T entity)
 		{
 			if (entity == null) throw new ArgumentNullException("entity");
 			_context.Entry(entity).State = EntityState.Modified;
-			_context.SaveChangesAsync();
+			await _context.SaveChangesAsync();
 		}
 
-		public virtual void Delete(T entity)
+		public virtual async  Task DeleteAsync(T entity)
 		{
 			if (entity == null) throw new ArgumentNullException("entity");
 			_dbset.Remove(entity);
-			_context.SaveChangesAsync();
+			await _context.SaveChangesAsync();
 		}
 
-		public virtual IEnumerable<T> GetAll()
-		{
-			return _dbset.AsEnumerable<T>();
-		}
-	}
+        public virtual async Task<IList<T>> GetAllAsync()
+        {
+			return await _dbset.ToListAsync<T>(); 
+        }
+    }
 }

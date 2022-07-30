@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+ 
 namespace PROJBP.UI.Data
 {
     public class ApplicationDbContext : IdentityDbContext
@@ -9,5 +9,5 @@ namespace PROJBP.UI.Data
             : base(options)
         {
         }
-    }
+     }
 }

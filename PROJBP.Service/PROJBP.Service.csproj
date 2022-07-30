@@ -10,8 +10,4 @@
     <ProjectReference Include="..\PROJBP.Model\PROJBP.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BillingService\" />
-  </ItemGroup>
-
 </Project>

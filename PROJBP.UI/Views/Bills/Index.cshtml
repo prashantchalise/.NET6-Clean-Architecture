@@ -1,0 +1,65 @@
+﻿@model IEnumerable<PROJBP.Model.Bill>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BillNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BilledDateUTC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VATNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BillStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BillNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BilledDateUTC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VATNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BillStatus)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BillId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BillId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BillId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

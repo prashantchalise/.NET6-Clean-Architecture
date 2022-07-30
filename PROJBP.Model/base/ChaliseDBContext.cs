@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Data.SqlClient;
 
 namespace PROJBP.Model
 {
 
     public interface IContext
     {
+		DbSet<Bill> Bill { get; set; }
 
 		DbSet<TEntity> Set<TEntity>() where TEntity : class;
 		EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class; 
@@ -24,6 +24,9 @@ namespace PROJBP.Model
 		 
 		#endregion
 
+		public DbSet<Bill> Bill { get; set; }
+
+
 		#region Methods
 		public Task<int> SaveChangesAsync()
 		{
@@ -36,7 +39,13 @@ namespace PROJBP.Model
 				IAuditableEntity entity = entry.Entity as IAuditableEntity;
 				if (entity != null)
 				{
-					string identityName = Thread.CurrentPrincipal.Identity.Name;
+					string identityName = "";
+					if (Thread.CurrentPrincipal is not null)
+					{
+						identityName = Thread.CurrentPrincipal.Identity.Name;
+					}
+					
+					
 					DateTime now = DateTime.UtcNow;
 
 					if (entry.State == EntityState.Added)
