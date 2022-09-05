@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PROJBP.Model;
 using PROJBP.Service;
-using System.Data.Entity.Infrastructure;
 
 namespace PROJBP.UI.Controllers
 {

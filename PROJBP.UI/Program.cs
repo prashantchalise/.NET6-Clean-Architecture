@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PROJBP.UI.Data;
+using PROJBP.UI.Models;
 using PROJBP.UI.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,15 +19,78 @@ builder.Services.IncludeServiceModule(builder.Configuration);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    {
+        options.UseSqlServer(connectionString);
+
+        // Register the entity sets needed by OpenIddict.
+        options.UseOpenIddict();
+    });
+
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.AddRazorPages();
+// Register the Identity services.
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
 
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+//    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+
+
+builder.Services.AddOpenIddict()
+
+                // Register the OpenIddict core components.
+                .AddCore(options =>
+                {
+                    // Configure OpenIddict to use the EF Core stores/models.
+                    options.UseEntityFrameworkCore()
+                        .UseDbContext<ApplicationDbContext>();
+                })
+
+                // Register the OpenIddict server components.
+                .AddServer(options =>
+                {
+                    options
+                        .AllowClientCredentialsFlow()
+                        .AllowAuthorizationCodeFlow()
+                        .RequireProofKeyForCodeExchange()
+                        .AllowRefreshTokenFlow();
+
+                    options
+                        .SetTokenEndpointUris("/connect/token")
+                        .SetAuthorizationEndpointUris("/connect/authorize")
+                        .SetUserinfoEndpointUris("/connect/userinfo");
+
+                    // Encryption and signing of tokens
+                    options
+                        .AddEphemeralEncryptionKey()
+                        .AddEphemeralSigningKey()
+                        .DisableAccessTokenEncryption();
+
+                    // Register scopes (permissions)
+                    options.RegisterScopes("api");
+
+
+                    // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
+                    options
+                        .UseAspNetCore()
+                        .EnableTokenEndpointPassthrough()
+                        .EnableAuthorizationEndpointPassthrough()
+                        .EnableUserinfoEndpointPassthrough();
+                });
+
+
+//builder.Services.AddHostedService<TestData>();
+builder.Services.AddHostedService<Worker>();
+
+
+builder.Services.AddRazorPages();
 
 //Add Controllers with views;
 builder.Services.AddControllersWithViews();
