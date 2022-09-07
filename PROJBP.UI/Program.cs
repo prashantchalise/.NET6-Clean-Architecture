@@ -1,96 +1,27 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using PROJBP.UI.Data;
-using PROJBP.UI.Models;
 using PROJBP.UI.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMvc();
+builder.Services.AddRazorPages();
 
 // Add EF Module to DI
 builder.Services.IncludeEFModule(builder.Configuration);
 
 //Register Service Modules to DI
-builder.Services.IncludeServiceModule(builder.Configuration);
+builder.Services.IncludeServiceModule();
 
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+//Add autentication Providers;
+builder.Services.AddAutenticationProviders();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseSqlServer(connectionString);
-
-        // Register the entity sets needed by OpenIddict.
-        options.UseOpenIddict();
-    });
-
+//Perform Oauth Setup using openiddict;
+// Configure the Application db context, user manager and signin manager to use a single instance per request
+builder.Services.OAuthSetupWithRefreshToken(builder.Configuration);
 
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
-// Register the Identity services.
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders()
-    .AddDefaultUI();
-
-//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-//    .AddEntityFrameworkStores<ApplicationDbContext>();
-
-
-
-
-builder.Services.AddOpenIddict()
-
-                // Register the OpenIddict core components.
-                .AddCore(options =>
-                {
-                    // Configure OpenIddict to use the EF Core stores/models.
-                    options.UseEntityFrameworkCore()
-                        .UseDbContext<ApplicationDbContext>();
-                })
-
-                // Register the OpenIddict server components.
-                .AddServer(options =>
-                {
-                    options
-                        .AllowClientCredentialsFlow()
-                        .AllowAuthorizationCodeFlow()
-                        .RequireProofKeyForCodeExchange()
-                        .AllowRefreshTokenFlow();
-
-                    options
-                        .SetTokenEndpointUris("/connect/token")
-                        .SetAuthorizationEndpointUris("/connect/authorize")
-                        .SetUserinfoEndpointUris("/connect/userinfo");
-
-                    // Encryption and signing of tokens
-                    options
-                        .AddEphemeralEncryptionKey()
-                        .AddEphemeralSigningKey()
-                        .DisableAccessTokenEncryption();
-
-                    // Register scopes (permissions)
-                    options.RegisterScopes("api");
-
-
-                    // Register the ASP.NET Core host and configure the ASP.NET Core-specific options.
-                    options
-                        .UseAspNetCore()
-                        .EnableTokenEndpointPassthrough()
-                        .EnableAuthorizationEndpointPassthrough()
-                        .EnableUserinfoEndpointPassthrough();
-                });
-
-
-//builder.Services.AddHostedService<TestData>();
-builder.Services.AddHostedService<Worker>();
-
-
-builder.Services.AddRazorPages();
 
 //Add Controllers with views;
 builder.Services.AddControllersWithViews();

@@ -22,8 +22,7 @@ namespace PROJBP.UI.Modules
 
     public static class ServiceModule
     { 
-        public static IServiceCollection IncludeServiceModule(this IServiceCollection services,
-         IConfiguration configuration)
+        public static IServiceCollection IncludeServiceModule(this IServiceCollection services)
         {
             var appServices = System.Reflection.Assembly.Load("PROJBP.Service").GetTypes().Where(s => s.Name.EndsWith("Service") && s.IsInterface == false).ToList();
             foreach (var appService in appServices) 
